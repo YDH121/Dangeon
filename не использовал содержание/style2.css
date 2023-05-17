@@ -1,0 +1,91 @@
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+
+}
+.container {
+	margin: 200px auto;
+	width: 300px;
+	background-color: #000;
+	position: relative;
+	color: #fff;
+	text-align: center;
+	height: 255px;
+}
+#check-menu {
+display: none;
+
+}
+label { 
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 100px;
+	width: 100%
+	height: 100%;
+	cursor: pointer;
+	line-height: 40px; 
+
+}
+.burger-line {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	width: 35px;
+	height: 2px;
+	background-color: #fff;
+	transition: .3s all;
+}
+.burger-line:nth-of-type(2), 
+.burger-line:nth-of-type(3){
+	top: 18px;
+
+}
+.burger-line:nth-of-type(4){
+	top: 28px;
+
+}
+.main-menu{
+	display: block;
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+	max-height: 0;
+	font-size: 0;
+	overflow: hidden;
+	transform: translate(100%);
+	transition: .3s all;
+
+}
+.main-menu a {
+display: block;
+width: 100%;
+padding: 10px;
+color: #fff;
+background-color: #000;
+text-decoration: none;
+border: 1px solid gray;
+}
+.main-menu a:hover{
+background-color: grey;
+
+}
+#check-menu:checked ~ .main-menu{
+max-height: 500px;
+font-size:  16px;
+color: #fff;
+}
+#check-menu:checked ~ .burger-line:nth-last-of-type(1),
+	#check-menu:checked ~ .burger-line:nth-last-of-type(4){
+display: none;
+
+
+}
+#check-menu:checked ~ .burger-line:nth-last-of-type(2){
+transform: rotate(45deg);
+}
+#check-menu:checked ~ .burger-line:nth-last-of-type(3){
+transform: rotate(-45deg);
+}

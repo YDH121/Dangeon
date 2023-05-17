@@ -1,0 +1,254 @@
+<html>
+<head>
+<style>
+/* Стили для таблицы и ячеек */
+table {
+border-collapse: collapse;
+margin: auto;
+}
+
+td {
+width: 100px;
+height: 100px;
+border: 1px solid black;
+text-align: center;
+font-size: 36px;
+font-family: Arial;
+}
+
+/* Стили для кнопки и текста */
+button {
+display: block;
+margin: 20px auto;
+padding: 10px 20px;
+font-size: 24px;
+}
+
+p {
+text-align: center;
+font-size: 24px;
+}
+
+/* Стили для фотографии и имени ИИ */
+img {
+width: 100px;
+height: 100px;
+border-radius: 50%;
+margin-right: 10px;
+}
+
+span {
+display: inline-block;
+vertical-align: middle;
+font-size: 24px;
+}
+
+div {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+</style>
+</head>
+<body>
+<!— Таблица для игрового поля —>
+<table>
+<tr>
+<td id="cell_0"></td>
+<td id="cell_1"></td>
+<td id="cell_2"></td>
+</tr>
+<tr>
+<td id="cell_3"></td>
+<td id="cell_4"></td>
+<td id="cell_5"></td>
+</tr>
+<tr>
+<td id="cell_6"></td>
+<td id="cell_7"></td>
+<td id="cell_8"></td>
+</tr>
+</table>
+
+<!— Кнопка для начала новой игры —>
+<button id="reset">Начать заново</button>
+
+<!— Текст для показа результата игры —>
+<p id="result"></p>
+
+<!— Фотография и имя ИИ —>
+<div id="ai">
+<img src="Putin.png" alt="ИИ">
+<span>С вами играет Владимир Владимирович Путин</span>
+</div>
+
+<!— Скрипт для логики игры —>
+<script>
+
+// Получаем ссылки на элементы страницы
+var cells = document.getElementsByTagName("td"); // ячейки таблицы
+var reset = document.getElementById("reset"); // кнопка сброса
+var result = document.getElementById("result"); // текст результата
+var ai = document.getElementById("ai"); // блок с фото и именем ИИ
+
+// Создаем переменные для хранения состояния игры
+var turn = "X"; // очередь хода (X или O)
+var board = ["", "", "", "", "", "", "", "", ""]; // массив с содержимым ячеек
+var gameOver = false; // флаг окончания игры
+
+// Создаем константы для возможных исходов игры
+var WIN_X = "Победили крестики!";
+var WIN_O = "Победили нолики!";
+var DRAW = "Ничья!";
+
+// Создаем константу для хранения символа ИИ
+var AI_SYMBOL = "O";
+
+// Создаем функцию для проверки победы
+function checkWin(symbol) {
+// Возвращаем true, если одна из комбинаций заполнена символом
+return (
+(board[0] == symbol && board[1] == symbol && board[2] == symbol) || // верхний ряд
+(board[3] == symbol && board[4] == symbol && board[5] == symbol) || // средний ряд
+(board[6] == symbol && board[7] == symbol && board[8] == symbol) || // нижний ряд
+(board[0] == symbol && board[3] == symbol && board[6] == symbol) || // левый столбец
+(board[1] == symbol && board[4] == symbol && board[7] == symbol) || // средний столбец
+(board[2] == symbol && board[5] == symbol && board[8] == symbol) || // правый столбец
+(board[0] == symbol && board[4] == symbol && board[8] == symbol) || // главная диагональ
+(board[2] == symbol && board[4] == symbol && board[6] == symbol) // побочная диагональ
+);
+}
+
+// Создаем функцию для проверки ничьи
+function checkDraw() {
+// Возвращаем true, если все ячейки заполнены и нет победы
+return (
+board.every(cell => cell != "") && // все ячейки не пустые
+!checkWin("X") && !checkWin("O") // нет победы ни у кого
+);
+}
+
+// Создаем функцию для обновления текста результата
+function updateResult(text) {
+// Устанавливаем текст в элементе result
+result.textContent = text;
+// Показываем элемент result
+result.style.display = "block";
+}
+
+// Создаем функцию для сброса игры
+function resetGame() {
+// Очищаем содержимое всех ячеек
+for (var i = 0; i < cells.
+length; i++) {
+cells[i].textContent = "";
+}
+// Очищаем массив с состоянием игры
+board = ["", "", "", "", "", "", "", "", ""];
+// Скрываем текст результата
+result.style.display = "none";
+// Устанавливаем очередь хода на X
+turn = "X";
+// Сбрасываем флаг окончания игры
+gameOver = false;
+}
+
+// Создаем функцию для хода ИИ
+function aiMove() {
+// Создаем массив с индексами свободных ячеек
+var freeCells = [];
+for (var i = 0; i < board.length; i++) {
+if (board[i] == "") {
+freeCells.push(i);
+}
+}
+// Если есть свободные ячейки
+if (freeCells.length > 0) {
+// Выбираем случайный индекс из массива
+var randomIndex = Math.floor(Math.random() * freeCells.length);
+// Получаем номер ячейки по индексу
+var cellNumber = freeCells[randomIndex];
+// Получаем ссылку на элемент ячейки по номеру
+var cell = document.getElementById("cell_" + cellNumber);
+// Заполняем ячейку символом ИИ
+cell.textContent = AI_SYMBOL;
+// Обновляем массив с состоянием игры
+board[cellNumber] = AI_SYMBOL;
+// Проверяем, выиграл ли ИИ
+if (checkWin(AI_SYMBOL)) {
+// Обновляем текст результата
+updateResult(WIN_O);
+// Устанавливаем флаг окончания игры
+gameOver = true;
+}
+// Проверяем, наступила ли ничья
+else if (checkDraw()) {
+// Обновляем текст результата
+updateResult(DRAW);
+// Устанавливаем флаг окончания игры
+gameOver = true;
+}
+// Если игра не закончилась
+else {
+// Меняем очередь хода на X
+turn = "X";
+}
+}
+}
+
+// Добавляем обработчик события клика на кнопку сброса
+reset.addEventListener("click", function() {
+// Вызываем функцию сброса игры
+resetGame();
+});
+
+// Добавляем обработчики события клика на каждую ячейку таблицы
+for (var i = 0; i < cells.length; i++) {
+// Получаем ссылку на текущую ячейку
+var cell = cells[i];
+// Добавляем обработчик события клика на ячейку
+cell.addEventListener("click", function() {
+// Если игра не закончилась и ячейка пустая
+if (!gameOver && this.textContent == "") {
+// Заполняем ячейку символом очереди хода
+this.textContent = turn;
+// Получаем номер ячейки по id элемента
+var cellNumber = this.id.slice(-1);
+// Обновляем массив с состоянием игры
+board[cellNumber] = turn;
+// Проверяем, выиграл ли текущий игрок
+if (checkWin(turn)) {
+// Обновляем текст результата в зависимости от очереди хода
+if (turn == "X") {
+updateResult(WIN_X);
+} else {
+updateResult(WIN_O);
+}
+// Устанавливаем флаг окончания игры
+gameOver = true;
+}
+// Проверяем, наступила ли ничья
+else if (checkDraw()) {
+// Обновляем текст результата
+updateResult(DRAW);
+// Устанавливаем флаг окончания игры
+gameOver = true;
+}
+// Если игра не закончилась
+else {
+// Меняем очередь хода на противоположный символ
+if (turn == "X") {
+turn = "O";
+// Вызываем функцию хода ИИ
+aiMove();
+} else {
+turn = "X";
+}
+}
+}
+});
+}
+
+</script>
+</body>
+</html>

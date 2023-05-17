@@ -1,0 +1,236 @@
+<html>
+<head>
+<style>
+body {
+font-family: Arial, sans-serif;
+background-color: #f0f0f0;
+}
+
+h1 {
+text-align: center;
+color: #333;
+}
+
+#board {
+width: 300px;
+height: 300px;
+margin: 0 auto;
+border: 2px solid #999;
+display: grid;
+grid-template-columns: repeat(10, 1fr);
+grid-template-rows: repeat(10, 1fr);
+}
+
+.cell {
+border: 1px solid #ccc;
+background-color: #eee;
+cursor: pointer;
+}
+
+.cell:hover {
+background-color: #ddd;
+}
+
+.cell.mine {
+background-color: #f00;
+}
+
+.cell.flag {
+background-color: #ff0;
+}
+
+.cell.revealed {
+background-color: #fff;
+cursor: default;
+}
+
+.cell.number {
+color: #00f;
+font-weight: bold;
+text-align: center;
+line-height: 30px;
+}
+</style>
+</head>
+<body>
+<h1>Игра Сапер</h1>
+<div id="board"></div>
+<script>
+// Количество мин на доске
+var mineCount = 10;
+
+// Создаем двумерный массив для хранения ячеек
+var cells = [];
+
+// Создаем доску из дивов с классом cell
+var board = document.getElementById("board");
+for (var i = 0; i < 10; i++) {
+cells[i] = [];
+for (var j = 0; j < 10; j++) {
+var cell = document.createElement("div");
+cell.className = "cell";
+cell.dataset.row = i;
+cell.dataset.col = j;
+cell.addEventListener("click", handleClick);
+cell.addEventListener("contextmenu", handleRightClick);
+board.appendChild(cell);
+cells[i][j] = cell;
+}
+}
+
+// Расставляем мины на доске случайным образом
+var mines = [];
+while (mines.length < mineCount) {
+var row = Math.floor(Math.random() * 10);
+var col = Math.floor(Math.random() * 10);
+var cell = cells[row][col];
+if (!cell.classList.contains("mine")) {
+cell.classList.add("mine");
+mines.push(cell);
+}
+}
+
+// Для каждой ячейки подсчитываем количество мин в соседних ячейках
+for (var i = 0; i < cells.length; i++) {
+for (var j = 0; j < cells[i].length; j++) {
+var cell = cells[i][j];
+if (!cell.classList.contains("mine")) {
+var count = countMines(i, j);
+if (count > 0) {
+cell.dataset.count = count;
+}
+}
+}
+}
+
+// Функция для подсчета мин в соседних ячейках
+function countMines(row, col) {
+var count = 0;
+
+// Проверяем все восемь направлений относительно ячейки
+for (var i = -1; i <= +1; i++) {
+for (var j = -1; j <= +1; j++) {
+
+// Пропускаем саму ячейку
+if (i == 0 && j == 0) continue;
+
+// Проверяем границы доски
+if (row + i < 0 || row + i >= cells.length) continue;
+if (col + j < 0 || col + j >= cells[row].length) continue;
+
+// Проверяем наличие мины в соседней ячейке
+var cell = cells[row + i][col + j];
+if (cell.classList.contains("mine")) {
+count++;
+}
+}
+}
+return count;
+}
+
+// Функция для обработки клика по ячейке
+function handleClick(event) {
+
+// Получаем ячейку по которой кликнули
+var cell = event.target;
+
+// Если ячейка уже открыта или помечена флагом, то ничего не делаем
+if (cell.classList.contains("revealed") || cell.classList.contains("flag")) return;
+
+// Если ячейка содержит мину, то игра проиграна
+if (cell.classList.contains("mine")) {
+alert("Вы проиграли!");
+revealAll();
+return;
+}
+
+// Открываем ячейку и показываем число, если оно есть
+cell.classList.add("revealed");
+if (cell.dataset.count) {
+cell.classList.add("number");
+cell.textContent = cell.dataset.count;
+} else {
+// Если ячейка пустая, то открываем все соседние ячейки рекурсивно
+var row = parseInt(cell.dataset.row);
+var col = parseInt(cell.dataset.col);
+for (var i = -1; i <= +1; i++) {
+for (var j = -1; j <= +1; j++) {
+// Пропускаем саму ячейку
+if (i == 0 && j == 0) continue;
+
+// Проверяем границы доски
+if (row + i < 0 || row + i >= cells.length) continue;
+if (col + j < 0 || col + j >= cells[row].length) continue;
+
+// Рекурсивно открываем соседнюю ячейку
+var cell = cells[row + i][col + j];
+handleClick({ target: cell });
+}
+}
+}
+
+// Проверяем условие победы
+if (checkWin()) {
+alert("Вы победили!");
+revealAll();
+}
+}
+
+// Функция для обработки правого клика по ячейке
+function handleRightClick(event) {
+
+// Отменяем действие по умолчанию (показ контекстного меню)
+event.preventDefault();
+
+// Получаем ячейку по которой кликнули
+var cell = event.target;
+
+// Если ячейка уже открыта, то ничего не делаем
+if (cell.classList.contains("revealed")) return;
+
+// Переключаем флаг на ячейке
+cell.classList.toggle("flag");
+}
+
+// Функция для проверки условия победы
+function checkWin() {
+
+// Ищем закрытые ячейки без флагов
+for (var i = 0; i < cells.length; i++) {
+for (var j = 0; j < cells[i].length; j++) {
+var cell = cells[i][j];
+if (!cell.classList.contains("revealed") && !cell.classList.contains("flag")) {
+return false;
+}
+}
+}
+
+// Если таких нет, то игра выиграна
+return true;
+}
+
+// Функция для открытия всех ячеек на доске
+function revealAll() {
+
+// Удаляем обработчики событий с доски
+board.removeEventListener("click", handleClick);
+board.removeEventListener("contextmenu", handleRightClick);
+
+// Открываем все ячейки и показываем мины и числа
+for (var i = 0; i < cells.length; i++) {
+for (var j = 0; j < cells[i].length; j++) {
+var cell = cells[i][j];
+cell.classList.add("revealed");
+if (cell.classList.contains("mine")) {
+cell.textContent = "💣";
+}
+if (cell.dataset.count) {
+cell.classList.add("number");
+cell.textContent = cell.dataset.count;
+}
+}
+}
+}
+</script>
+</body>
+</html>

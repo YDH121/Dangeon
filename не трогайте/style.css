@@ -1,0 +1,46 @@
+body {
+background-color: #F7F7F7;
+font-family: Arial, sans-serif;
+}
+
+h1 {
+text-align: center;
+color: #333;
+}
+
+.container {
+width: 80%;
+margin: 0 auto;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+
+.btn {
+background-color: #3B5F85;
+color: #FFF;
+border: none;
+border-radius: 5px;
+padding: 10px 20px;
+margin: 10px;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.btn:hover {
+background-color: #FCC01C;
+color: #333;
+}
+
+#info {
+background-color: #FFF;
+color: #333;
+border-radius: 5px;
+padding: 20px;
+margin-top: 20px;
+width: 100%;
+text-align: justify;
+box-shadow: 0px 0px 5px #CCC;
+}
